@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BoxControl - Login</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#0f172a;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;color:#fff}
+    .card{width:420px;max-width:92vw;background:#111827;border-radius:14px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    h1{margin:0 0 6px 0;font-size:22px}
+    p{margin:0 0 18px 0;opacity:.85}
+    input{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#0b1220;color:#fff;margin-bottom:10px}
+    button{width:100%;padding:12px;border:none;border-radius:10px;background:#3182ce;color:#fff;font-weight:700;cursor:pointer}
+    button:hover{filter:brightness(1.05)}
+    .row{display:flex;gap:10px}
+    .btn2{background:#38a169}
+    .msg{margin-top:10px;font-size:13px;opacity:.95}
+    .small{font-size:12px;opacity:.7;margin-top:14px;line-height:1.4}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>BoxControl</h1>
+    <p>Entre para acessar o painel</p>
+
+    <input id="nome" placeholder="Nome da oficina (opcional)" />
+    <input id="email" placeholder="Email" />
+    <input id="senha" placeholder="Senha" type="password" />
+
+    <div class="row">
+      <button id="btnEntrar">Entrar</button>
+      <button id="btnCriar" class="btn2">Criar Conta</button>
+    </div>
+
+    <div class="msg" id="msg"></div>
+
+    <div class="small">
+      • Login de teste (salva no navegador).<br/>
+      • Para multiusuário real depois, a gente coloca backend + banco.
+    </div>
+  </div>
+
+  <script>
+    function safeParse(key, fallback){
+      try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+      catch(e){ return fallback; }
+    }
+    function setJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+
+    function getUsers(){ return safeParse("bc_users", []); }
+    function setUsers(u){ setJSON("bc_users", u); }
+
+    function setSession(user){
+      setJSON("bc_session", {
+        id: user.id,
+        nome: user.nome || "",
+        email: user.email,
+        loginAt: Date.now()
+      });
+    }
+
+    function show(msg, ok=false){
+      const el = document.getElementById("msg");
+      el.textContent = msg;
+      el.style.color = ok ? "#86efac" : "#fca5a5";
+    }
+
+    document.getElementById("btnCriar").addEventListener("click", ()=>{
+      const nome = document.getElementById("nome").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const senha = document.getElementById("senha").value;
+
+      if(!email || !senha){
+        show("Preencha email e senha para criar conta.");
+        return;
+      }
+
+      const users = getUsers();
+      if(users.some(u => u.email === email)){
+        show("Este email já está cadastrado. Use Entrar.");
+        return;
+      }
+
+      const user = { id: String(Date.now()), nome, email, senha };
+      users.push(user);
+      setUsers(users);
+      setSession(user);
+
+      show("Conta criada e logado com sucesso!", true);
+      setTimeout(()=> window.location.href = "dashboard.html", 350);
+    });
+
+    document.getElementById("btnEntrar").addEventListener("click", ()=>{
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const senha = document.getElementById("senha").value;
+
+      if(!email || !senha){
+        show("Digite email e senha.");
+        return;
+      }
+
+      const users = getUsers();
+      const user = users.find(u => u.email === email && u.senha === senha);
+
+      if(!user){
+        show("Email ou senha incorretos.");
+        return;
+      }
+
+      setSession(user);
+      show("Login OK! Indo para o painel...", true);
+      setTimeout(()=> window.location.href = "dashboard.html", 300);
+    });
+
+    // Se já estiver logado, vai direto pro dashboard
+    (function(){
+      const sess = safeParse("bc_session", null);
+      if(sess && sess.email){
+        window.location.href = "dashboard.html";
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f9; color: #333; }
+.dashboard-container { display: flex; height: 100vh; }
+aside.sidebar { width: 220px; background: #1a202c; color: #fff; padding: 20px; }
+aside.sidebar h2 { margin-top: 0; }
+aside.sidebar ul { list-style: none; padding: 0; }
+aside.sidebar li { padding: 10px; cursor: pointer; border-radius: 5px; }
+aside.sidebar li:hover { background: #2d3748; }
+main.main-content { flex: 1; padding: 20px; overflow-y: auto; }
+.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.cards { display: flex; gap: 15px; margin-bottom: 20px; }
+.card { flex: 1; padding: 20px; border-radius: 8px; text-align: center; cursor: pointer; color: #fff; }
+.btn-primary { background: #3182ce; }
+.btn-secondary { background: #38a169; }
+form input, form textarea, form select { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+form button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; color: #fff; background: #3182ce; margin-top: 5px; }
+.orcamento-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+.orcamento-table th, .orcamento-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+.orcamento-table th { background: #e2e8f0; }
+button.add-item, button.remove-item { background: #38a169; color: #fff; border: none; padding: 5px 10px; margin-top: 5px; cursor: pointer; border-radius: 5px; }
+button.remove-item { background: #e53e3e; }
+.total-box { margin-top: 10px; font-weight: bold; text-align: right; }
+.history-item { padding: 10px; background: #fff; margin-bottom: 5px; border-radius: 5px; cursor: pointer; }
+

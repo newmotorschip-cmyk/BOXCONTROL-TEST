@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BoxControl - Dashboard Profissional</title>
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f9; color: #333; }
+    .dashboard-container { display: flex; height: 100vh; }
+    aside.sidebar { width: 220px; background: #1a202c; color: #fff; padding: 20px; }
+    aside.sidebar h2 { margin-top: 0; }
+    aside.sidebar ul { list-style: none; padding: 0; }
+    aside.sidebar li { padding: 10px; cursor: pointer; border-radius: 5px; }
+    aside.sidebar li:hover { background: #2d3748; }
+
+    main.main-content { flex: 1; padding: 20px; overflow-y: auto; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .cards { display: flex; gap: 15px; margin-bottom: 20px; }
+    .card { flex: 1; padding: 20px; border-radius: 8px; text-align: center; cursor: pointer; color: #fff; user-select: none; }
+    .btn-primary { background: #3182ce; }
+    .btn-secondary { background: #38a169; }
+
+    form input, form textarea, form select {
+      width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;
+    }
+    form button { padding: 10px 14px; border: none; border-radius: 5px; cursor: pointer; color: #fff; background: #3182ce; }
+    .btn-row { display:flex; gap:10px; flex-wrap: wrap; margin-top: 10px; }
+    .btn-muted { background:#4a5568; }
+    .btn-danger { background:#c53030; }
+
+    table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+    table th, table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    table th { background: #e2e8f0; }
+
+    .history-item, .client-item, .os-item {
+      padding: 10px; background: #fff; margin-bottom: 8px; border-radius: 5px; cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    }
+    .client-item { display:flex; justify-content: space-between; align-items:center; gap:10px; }
+    .pill { padding: 4px 8px; border-radius: 999px; background:#edf2f7; font-size: 12px; }
+
+    .kanban { display: flex; gap: 15px; margin-top: 20px; }
+    .column { background: #e2e8f0; flex: 1; padding: 10px; border-radius: 8px; min-height: 300px; }
+    .column h2 { text-align: center; }
+
+    .card-kanban {
+      background: #fff; padding: 10px; margin-bottom: 10px; border-radius: 5px;
+      cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      white-space: pre-line;
+    }
+    .card-kanban small { display:block; opacity: .75; margin-top: 4px; }
+
+    .btn-logout { padding: 10px 14px; border:none; border-radius: 8px; cursor:pointer; background:#c53030; color:#fff; }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>BoxControl</h2>
+      <nav>
+        <ul>
+          <li class="menu-item" data-page="ordem-servico">Ordem de Serviço</li>
+          <li class="menu-item" data-page="cadastro-cliente">Cadastro Cliente</li>
+          <li class="menu-item" data-page="clientes">Clientes</li>
+          <li class="menu-item" data-page="checklist">Checklist</li>
+          <li class="menu-item" data-page="carros-servico">Carros em Serviço</li>
+          <li class="menu-item" data-page="historico">Histórico</li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="topbar">
+        <h1 id="welcomeTitle">Bem-vindo!</h1>
+        <button class="btn-logout" id="btnLogout">Sair</button>
+      </header>
+
+      <!-- Cards de atalhos -->
+      <section class="cards">
+        <div class="card btn-primary" data-action="nova-ordem">Nova Ordem de Serviço</div>
+        <div class="card btn-secondary" data-action="novo-cliente">Novo Cliente</div>
+      </section>
+
+      <!-- Área dinâmica de conteúdo -->
+      <div id="content-area"></div>
+
+      <!-- Kanban fixo -->
+      <section class="kanban" id="kanban">
+        <div class="column aguardando"><h2>Aguardando</h2></div>
+        <div class="column em-servico"><h2>Em Serviço</h2></div>
+        <div class="column finalizado"><h2>Finalizado + Entregue</h2></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- PROTEÇÃO LOGIN + LOGOUT -->
+  <script>
+    function safeParse(key, fallback){
+      try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+      catch(e){ return fallback; }
+    }
+
+    // Se não estiver logado, volta pro login (index.html)
+    (function(){
+      const sess = safeParse("bc_session", null);
+      if(!sess || !sess.email){
+        window.location.href = "index.html";
+        return;
+      }
+      const nome = (sess.nome || "").trim();
+      const title = document.getElementById("welcomeTitle");
+      if(title) title.textContent = nome ? `Bem-vindo, ${nome}!` : "Bem-vindo!";
+    })();
+
+    // Botão sair
+    document.addEventListener("DOMContentLoaded", ()=>{
+      const btn = document.getElementById("btnLogout");
+      if(btn){
+        btn.addEventListener("click", ()=>{
+          localStorage.removeItem("bc_session");
+          window.location.href = "index.html";
+        });
+      }
+    });
+  </script>
+
+  <!-- Libs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
